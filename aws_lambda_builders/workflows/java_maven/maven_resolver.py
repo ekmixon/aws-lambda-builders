@@ -10,13 +10,13 @@ class MavenResolver(object):
         self.binary = "mvn"
         self.executables = [self.binary]
         self.executable_search_paths = executable_search_paths
-        self.os_utils = os_utils if os_utils else OSUtils()
+        self.os_utils = os_utils or OSUtils()
 
     @property
     def exec_paths(self):
-        paths = self.os_utils.which("mvn", executable_search_paths=self.executable_search_paths)
-
-        if not paths:
+        if paths := self.os_utils.which(
+            "mvn", executable_search_paths=self.executable_search_paths
+        ):
+            return paths
+        else:
             raise ValueError("No Maven executable found!")
-
-        return paths

@@ -39,11 +39,7 @@ class SubProcessMake(object):
         self.osutils = osutils
 
         if make_exe is None:
-            if osutils.is_windows():
-                make_exe = "make.exe"
-            else:
-                make_exe = "make"
-
+            make_exe = "make.exe" if osutils.is_windows() else "make"
         self.make_exe = make_exe
 
     def run(self, args, env=None, cwd=None):

@@ -30,13 +30,9 @@ class SubprocessDotnetCLI(object):
     """
 
     def __init__(self, dotnet_exe=None, os_utils=None):
-        self.os_utils = os_utils if os_utils else OSUtils()
+        self.os_utils = os_utils or OSUtils()
         if dotnet_exe is None:
-            if self.os_utils.is_windows():
-                dotnet_exe = "dotnet.exe"
-            else:
-                dotnet_exe = "dotnet"
-
+            dotnet_exe = "dotnet.exe" if self.os_utils.is_windows() else "dotnet"
         self.dotnet_exe = dotnet_exe
 
     def run(self, args, cwd=None):

@@ -31,7 +31,7 @@ class TestGradleBinaryValidator(TestCase):
 
     @parameterized.expand(["1.7.0", "1.8.9", "11.0.0", "12 (Fluff)", "12"])
     def test_accepts_any_jvm_mv(self, version):
-        version_string = ("JVM:          %s" % version).encode()
+        version_string = f"JVM:          {version}".encode()
         self.mock_os_utils.popen.side_effect = [FakePopen(stdout=version_string)]
         validator = GradleValidator(runtime=self.runtime, architecture=self.architecture, os_utils=self.mock_os_utils)
         self.assertTrue(validator.validate(runtime_path=self.runtime_path))
@@ -51,7 +51,7 @@ class TestGradleBinaryValidator(TestCase):
 
     @parameterized.expand(["1.6.0", "1.7.0", "1.8.9"])
     def test_does_not_emit_warning_when_jvm_mv_8_or_less(self, version):
-        version_string = ("JVM:          %s" % version).encode()
+        version_string = f"JVM:          {version}".encode()
         self.mock_os_utils.popen.side_effect = [FakePopen(stdout=version_string)]
         validator = GradleValidator(
             runtime=self.runtime, architecture=self.architecture, os_utils=self.mock_os_utils, log=self.mock_log

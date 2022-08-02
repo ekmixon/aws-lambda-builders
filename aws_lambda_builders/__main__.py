@@ -39,10 +39,9 @@ def _parse_version(version_string):
 
     if VERSION_REGEX.match(version_string):
         return float(version_string)
-    else:
-        ex = "Protocol Version does not match : {}".format(VERSION_REGEX.pattern)
-        LOG.debug(ex)
-        raise ValueError(ex)
+    ex = f"Protocol Version does not match : {VERSION_REGEX.pattern}"
+    LOG.debug(ex)
+    raise ValueError(ex)
 
 
 def version_compatibility_check(version):
@@ -54,9 +53,8 @@ def version_compatibility_check(version):
     # 0.2 < 0.1 comparison will fail, don't throw a value Error saying incompatible version
 
     if _parse_version(lambda_builders_protocol_version) < version:
-        ex = "Incompatible Protocol Version : {}, " "Current Protocol Version: {}".format(
-            version, lambda_builders_protocol_version
-        )
+        ex = f"Incompatible Protocol Version : {version}, Current Protocol Version: {lambda_builders_protocol_version}"
+
         LOG.error(ex)
         raise ValueError(ex)
 
@@ -67,7 +65,7 @@ def _write_response(response, exit_code):
     sys.exit(exit_code)
 
 
-def main():  # pylint: disable=too-many-statements
+def main():    # pylint: disable=too-many-statements
     """
     Implementation of CLI Interface. Handles only one JSON-RPC method at a time and responds with data
 
@@ -117,10 +115,12 @@ def main():  # pylint: disable=too-many-statements
         artifacts_dir = params["artifacts_dir"]
         builder.build(
             params["source_dir"],
-            params["artifacts_dir"],
+            artifacts_dir,
             params["scratch_dir"],
             params["manifest_path"],
-            executable_search_paths=params.get("executable_search_paths", None),
+            executable_search_paths=params.get(
+                "executable_search_paths", None
+            ),
             runtime=params["runtime"],
             optimizations=params["optimizations"],
             options=params["options"],

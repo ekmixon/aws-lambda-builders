@@ -81,7 +81,7 @@ class BaseAction(six.with_metaclass(_ActionMetaClass, object)):
         raise NotImplementedError("execute")
 
     def __repr__(self):
-        return "Name={}, Purpose={}, Description={}".format(self.NAME, self.PURPOSE, self.DESCRIPTION)
+        return f"Name={self.NAME}, Purpose={self.PURPOSE}, Description={self.DESCRIPTION}"
 
 
 class CopySourceAction(BaseAction):

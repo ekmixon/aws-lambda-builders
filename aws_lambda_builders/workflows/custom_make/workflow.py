@@ -39,8 +39,9 @@ class CustomMakeWorkflow(BaseWorkflow):
             raise WorkflowFailedError(
                 workflow_name=self.NAME,
                 action_name=None,
-                reason="Build target {} is not found!".format(build_logical_id),
+                reason=f"Build target {build_logical_id} is not found!",
             )
+
 
         subprocess_make = SubProcessMake(make_exe=self.binaries["make"].binary_path, osutils=self.os_utils)
 

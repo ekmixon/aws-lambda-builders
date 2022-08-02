@@ -52,7 +52,8 @@ class NodejsNpmPackAction(BaseAction):
         :raises lambda_builders.actions.ActionFailedError: when NPM packaging fails
         """
         try:
-            package_path = "file:{}".format(self.osutils.abspath(self.osutils.dirname(self.manifest_path)))
+            package_path = f"file:{self.osutils.abspath(self.osutils.dirname(self.manifest_path))}"
+
 
             LOG.debug("NODEJS packaging %s to %s", package_path, self.scratch_dir)
 

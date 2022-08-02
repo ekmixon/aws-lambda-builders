@@ -63,9 +63,7 @@ class TestPythonPipWorkflow(TestCase):
                         return  # Success
                     wheel_architectures.append(wheel_architecture)
         self.fail(
-            "Wheel architectures [{}] not found in [{}]".format(
-                ", ".join(wheel_architectures), ", ".join(architectures)
-            )
+            f'Wheel architectures [{", ".join(wheel_architectures)}] not found in [{", ".join(architectures)}]'
         )
 
     # Temporarily skipping this test in Windows
@@ -91,7 +89,7 @@ class TestPythonPipWorkflow(TestCase):
 
     def test_must_build_python_project_with_arm_architecture(self):
         if self.runtime != "python3.8":
-            self.skipTest("{} is not supported on ARM architecture".format(self.runtime))
+            self.skipTest(f"{self.runtime} is not supported on ARM architecture")
         ### Check the wheels
         self.builder.build(
             self.source_dir,

@@ -20,8 +20,9 @@ class PathResolver(object):
 
         if not exec_paths:
             raise ValueError(
-                "Path resolution for runtime: {} of binary: " "{} was not successful".format(self.runtime, self.binary)
+                f"Path resolution for runtime: {self.runtime} of binary: {self.binary} was not successful"
             )
+
         return exec_paths
 
     @property

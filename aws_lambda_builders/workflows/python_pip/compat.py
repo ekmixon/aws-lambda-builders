@@ -9,7 +9,7 @@ def pip_import_string(python_exe):
     cmd = [python_exe, "-c", "import pip; print(pip.__version__)"]
     p = os_utils.popen(cmd, stdout=os_utils.pipe, stderr=os_utils.pipe, env=os_utils.original_environ())
     stdout, stderr = p.communicate()
-    if not p.returncode == 0:
+    if p.returncode != 0:
         raise MissingPipError(python_path=python_exe)
     pip_version = stdout.decode("utf-8").strip()
     pip_major_version = int(pip_version.split(".")[0])

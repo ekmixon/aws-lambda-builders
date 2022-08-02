@@ -59,7 +59,7 @@ class CustomMakeAction(BaseAction):
     def manifest_check(self):
         # Check for manifest file presence and if not present raise MakefileNotFoundError
         if not self.osutils.exists(self.manifest_path):
-            raise MakeFileNotFoundError("Makefile not found at {}".format(self.manifest_path))
+            raise MakeFileNotFoundError(f"Makefile not found at {self.manifest_path}")
 
     def execute(self):
         """
@@ -87,11 +87,12 @@ class CustomMakeAction(BaseAction):
             self.subprocess_make.run(
                 [
                     "--makefile",
-                    "{}".format(self.manifest_path),
+                    f"{self.manifest_path}",
                     "build-{logical_id}".format(logical_id=self.build_logical_id),
                 ],
                 env=current_env,
                 cwd=self.scratch_dir,
             )
+
         except MakeExecutionError as ex:
             raise ActionFailedError(str(ex))

@@ -22,7 +22,7 @@ def read_requirements(req="base.txt"):
 
 def read_version():
     content = read(os.path.join(os.path.dirname(__file__), "aws_lambda_builders", "__init__.py"))
-    return re.search(r"__version__ = \"([^'\"]+)", content).group(1)
+    return re.search(r"__version__ = \"([^'\"]+)", content)[1]
 
 
 cmd_name = "lambda-builders"
@@ -34,7 +34,8 @@ setup(
     name="aws_lambda_builders",
     version=read_version(),
     description=(
-        "Python library to compile, build & package AWS Lambda functions for " "several runtimes & frameworks."
+        "Python library to compile, build & package AWS Lambda functions for "
+        "several runtimes & frameworks."
     ),
     long_description=read("README.md"),
     author="Amazon Web Services",
@@ -43,10 +44,14 @@ setup(
     license="Apache License 2.0",
     packages=find_packages(exclude=["tests.*", "tests"]),
     keywords="AWS Lambda Functions Building",
-    # Support Python 2.7 and 3.6 or greater
-    python_requires=(">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"),
-    entry_points={"console_scripts": ["{}=aws_lambda_builders.__main__:main".format(cmd_name)]},
-    install_requires=read_requirements("base.txt") + read_requirements("python_pip.txt"),
+    python_requires=(
+        ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
+    ),
+    entry_points={
+        "console_scripts": [f"{cmd_name}=aws_lambda_builders.__main__:main"]
+    },
+    install_requires=read_requirements("base.txt")
+    + read_requirements("python_pip.txt"),
     extras_require={"dev": read_requirements("dev.txt")},
     include_package_data=True,
     classifiers=[

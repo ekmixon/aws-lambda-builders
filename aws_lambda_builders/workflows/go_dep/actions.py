@@ -58,7 +58,7 @@ class GoBuildAction(BaseAction):
 
         self.subprocess_go = subprocess_go
         self.goarch = get_goarch(architecture)
-        self.env = env if not env is None else {}
+        self.env = env if env is not None else {}
 
     def execute(self):
         env = self.env

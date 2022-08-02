@@ -9,7 +9,7 @@ class DotnetCliResolver(object):
     def __init__(self, executable_search_paths=None, os_utils=None):
         self.binary = "dotnet"
         self.executable_search_paths = executable_search_paths
-        self.os_utils = os_utils if os_utils else OSUtils()
+        self.os_utils = os_utils or OSUtils()
 
     @property
     def exec_paths(self):

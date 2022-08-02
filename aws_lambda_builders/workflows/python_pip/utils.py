@@ -23,7 +23,7 @@ class OSUtils(object):
         # Check whether running as a PyInstaller binary
         if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
             lp_key = "LD_LIBRARY_PATH"
-            original_lp = env.get(lp_key + "_ORIG")
+            original_lp = env.get(f"{lp_key}_ORIG")
             if original_lp is not None:
                 env[lp_key] = original_lp
             else:
@@ -93,8 +93,7 @@ class OSUtils(object):
             shutil.rmtree(tempdir)
 
     def popen(self, command, stdout=None, stderr=None, env=None):
-        p = subprocess.Popen(command, stdout=stdout, stderr=stderr, env=env)
-        return p
+        return subprocess.Popen(command, stdout=stdout, stderr=stderr, env=env)
 
     def mtime(self, path):
         return os.stat(path).st_mtime

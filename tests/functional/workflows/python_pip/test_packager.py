@@ -38,16 +38,15 @@ def sdist_reader():
 
 @pytest.fixture
 def sdist_builder():
-    s = FakeSdistBuilder()
-    return s
+    return FakeSdistBuilder()
 
 
 class FakeSdistBuilder(object):
     _SETUP_PY = "from setuptools import setup\n" "setup(\n" '    name="%s",\n' '    version="%s"\n' ")\n"
 
     def write_fake_sdist(self, directory, name, version):
-        filename = "%s-%s.zip" % (name, version)
-        path = "%s/%s" % (directory, filename)
+        filename = f"{name}-{version}.zip"
+        path = f"{directory}/{filename}"
         with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as z:
             z.writestr("sdist/setup.py", self._SETUP_PY % (name, version))
         return directory, filename
@@ -160,17 +159,18 @@ class PipSideEffect(object):
 
     def execute(self, args):
         """Generate the file in the target_dir."""
-        if self._dirarg:
-            target_dir = None
-            for i, arg in enumerate(args):
-                if arg == self._dirarg:
-                    target_dir = args[i + 1]
-            if target_dir:
-                filepath = os.path.join(target_dir, self._filename)
-                if filepath.endswith(".whl"):
-                    self._build_fake_whl(target_dir, self._filename)
-                else:
-                    self._build_fake_sdist(filepath)
+        if not self._dirarg:
+            return
+        target_dir = None
+        for i, arg in enumerate(args):
+            if arg == self._dirarg:
+                target_dir = args[i + 1]
+        if target_dir:
+            filepath = os.path.join(target_dir, self._filename)
+            if filepath.endswith(".whl"):
+                self._build_fake_whl(target_dir, self._filename)
+            else:
+                self._build_fake_sdist(filepath)
 
 
 @pytest.fixture
@@ -883,8 +883,8 @@ class TestSdistMetadataFetcher(object):
     _VALID_TAR_FORMATS = ["tar.gz", "tar.bz2"]
 
     def _write_fake_sdist(self, setup_py, directory, ext, pkg_info_contents=None):
-        filename = "sdist.%s" % ext
-        path = "%s/%s" % (directory, filename)
+        filename = f"sdist.{ext}"
+        path = f"{directory}/{filename}"
         if ext == "zip":
             with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_DEFLATED) as z:
                 z.writestr("sdist/setup.py", setup_py)
@@ -892,7 +892,7 @@ class TestSdistMetadataFetcher(object):
                     z.writestr("sdist/PKG-INFO", pkg_info_contents)
         elif ext in self._VALID_TAR_FORMATS:
             compression_format = ext.split(".")[1]
-            with tarfile.open(path, "w:%s" % compression_format) as tar:
+            with tarfile.open(path, f"w:{compression_format}") as tar:
                 tarinfo = tarfile.TarInfo("sdist/setup.py")
                 tarinfo.size = len(setup_py)
                 tar.addfile(tarinfo, io.BytesIO(setup_py.encode()))
@@ -902,8 +902,7 @@ class TestSdistMetadataFetcher(object):
                     tar.addfile(tarinfo, io.BytesIO(pkg_info_contents.encode()))
         else:
             open(path, "a").close()
-        filepath = os.path.join(directory, filename)
-        return filepath
+        return os.path.join(directory, filename)
 
     def test_setup_tar_gz(self, osutils, sdist_reader):
         setup_py = self._SETUP_PY % (self._SETUPTOOLS, "foo", "1.0")
@@ -1025,23 +1024,20 @@ class TestPackage(object):
     def test_same_pkg_sdist_and_wheel_collide(self, osutils, sdist_builder):
         with osutils.tempdir() as tempdir:
             sdist_builder.write_fake_sdist(tempdir, "foobar", "1.0")
-            pkgs = set()
-            pkgs.add(Package("", "foobar-1.0-py3-none-any.whl"))
+            pkgs = {Package("", "foobar-1.0-py3-none-any.whl")}
             pkgs.add(Package(tempdir, "foobar-1.0.zip"))
             assert len(pkgs) == 1
 
     def test_ensure_sdist_name_normalized_for_comparison(self, osutils, sdist_builder):
         with osutils.tempdir() as tempdir:
             sdist_builder.write_fake_sdist(tempdir, "Foobar", "1.0")
-            pkgs = set()
-            pkgs.add(Package("", "foobar-1.0-py3-none-any.whl"))
+            pkgs = {Package("", "foobar-1.0-py3-none-any.whl")}
             pkgs.add(Package(tempdir, "Foobar-1.0.zip"))
             assert len(pkgs) == 1
 
     def test_ensure_wheel_name_normalized_for_comparison(self, osutils, sdist_builder):
         with osutils.tempdir() as tempdir:
             sdist_builder.write_fake_sdist(tempdir, "foobar", "1.0")
-            pkgs = set()
-            pkgs.add(Package("", "Foobar-1.0-py3-none-any.whl"))
+            pkgs = {Package("", "Foobar-1.0-py3-none-any.whl")}
             pkgs.add(Package(tempdir, "foobar-1.0.zip"))
             assert len(pkgs) == 1

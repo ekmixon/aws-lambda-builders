@@ -32,7 +32,7 @@ class GoDepWorkflow(BaseWorkflow):
             source_dir, artifacts_dir, scratch_dir, manifest_path, runtime=runtime, **kwargs
         )
 
-        options = kwargs["options"] if "options" in kwargs else {}
+        options = kwargs.get("options", {})
         handler = options.get("artifact_executable_name", None)
 
         if osutils is None:

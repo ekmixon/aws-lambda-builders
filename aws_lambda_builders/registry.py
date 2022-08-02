@@ -31,7 +31,10 @@ class Registry(object):
             self._write_lock.acquire()
 
             if key in self._data:
-                raise KeyError("A workflow with given capabilities '{}' is already registered".format(key))
+                raise KeyError(
+                    f"A workflow with given capabilities '{key}' is already registered"
+                )
+
 
             self._data[key] = value
 

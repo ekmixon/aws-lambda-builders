@@ -49,7 +49,7 @@ class GoModulesBuilder(object):
         :param output_path: Filename to write the executable output to.
         """
         env = {}
-        env.update(self.osutils.environ)
+        env |= self.osutils.environ
         env.update({"GOOS": "linux", "GOARCH": self.goarch})
         runtime_path = self.binaries[self.LANGUAGE].binary_path
         cmd = [runtime_path, "build"]

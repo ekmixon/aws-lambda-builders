@@ -35,12 +35,12 @@ class TestDotnetBase(TestCase):
         deps_file = pathlib.Path(self.artifacts_dir, deps_file_name)
 
         if not deps_file.exists():
-            self.fail("Failed verifying architecture, {} file not found".format(deps_file_name))
+            self.fail(f"Failed verifying architecture, {deps_file_name} file not found")
 
         with open(str(deps_file)) as f:
             deps_json = json.loads(f.read())
         version = self.runtime[-3:]
-        target_name = ".NETCoreApp,Version=v{}/{}".format(version, expected_architecture)
+        target_name = f".NETCoreApp,Version=v{version}/{expected_architecture}"
         target = deps_json.get("runtimeTarget").get("name")
 
         self.assertEqual(target, target_name)

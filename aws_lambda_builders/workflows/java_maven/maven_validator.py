@@ -28,8 +28,8 @@ class MavenValidator(RuntimeValidator):
         super(MavenValidator, self).__init__(runtime, architecture)
         self.language = "java"
         self._valid_binary_path = None
-        self.os_utils = OSUtils() if not os_utils else os_utils
-        self.log = LOG if not log else log
+        self.os_utils = os_utils or OSUtils()
+        self.log = log or LOG
 
     def validate(self, runtime_path):
         """
@@ -63,15 +63,11 @@ class MavenValidator(RuntimeValidator):
         return self._valid_binary_path
 
     def _get_major_version(self, maven_path):
-        vs = self._get_jvm_string(maven_path)
-        if vs:
+        if vs := self._get_jvm_string(maven_path):
             m = re.search(r"Java version:\s+([\d\.]+)", vs)
-            version = m.group(1).split(".")
+            version = m[1].split(".")
             # For Java 8 or earlier, version strings begin with 1.{Major Version}
-            if version[0] == "1":
-                return version[1]
-            # Starting with Java 9, the major version is first
-            return version[0]
+            return version[1] if version[0] == "1" else version[0]
 
     def _get_jvm_string(self, maven_path):
         p = self.os_utils.popen([maven_path, "-version"], stdout=self.os_utils.pipe, stderr=self.os_utils.pipe)

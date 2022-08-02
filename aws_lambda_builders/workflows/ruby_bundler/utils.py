@@ -21,8 +21,9 @@ class OSUtils(object):
             tar.extractall(unpack_dir)
 
     def popen(self, command, stdout=None, stderr=None, env=None, cwd=None):
-        p = subprocess.Popen(command, stdout=stdout, stderr=stderr, env=env, cwd=cwd)
-        return p
+        return subprocess.Popen(
+            command, stdout=stdout, stderr=stderr, env=env, cwd=cwd
+        )
 
     def joinpath(self, *args):
         return os.path.join(*args)

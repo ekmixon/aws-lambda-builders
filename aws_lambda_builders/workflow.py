@@ -39,7 +39,7 @@ class BuildMode(object):
 
 
 # TODO: Move sanitize out to its own class.
-def sanitize(func):  # pylint: disable=too-many-statements
+def sanitize(func):    # pylint: disable=too-many-statements
     """
     sanitize the executable path of the runtime specified by validating it.
     :param func: Workflow's run method is sanitized
@@ -55,10 +55,11 @@ def sanitize(func):  # pylint: disable=too-many-statements
             invalid_paths[binary] = []
             try:
                 exec_paths = (
-                    binary_checker.resolver.exec_paths
-                    if not binary_checker.path_provided
-                    else binary_checker.binary_path
+                    binary_checker.binary_path
+                    if binary_checker.path_provided
+                    else binary_checker.resolver.exec_paths
                 )
+
             except ValueError as ex:
                 raise WorkflowFailedError(workflow_name=self.NAME, action_name="Resolver", reason=str(ex))
             for executable_path in exec_paths:
@@ -123,7 +124,7 @@ class _WorkflowMetaClass(type):
 
         # All workflows must express their capabilities
         if not isinstance(cls.CAPABILITY, Capability):
-            raise ValueError("Workflow '{}' must register valid capabilities".format(cls.NAME))
+            raise ValueError(f"Workflow '{cls.NAME}' must register valid capabilities")
 
         LOG.debug("Registering workflow '%s' with capability '%s'", cls.NAME, cls.CAPABILITY)
         DEFAULT_REGISTRY[cls.CAPABILITY] = cls
@@ -270,7 +271,7 @@ class BaseWorkflow(six.with_metaclass(_WorkflowMetaClass, object)):
             )
 
         for action in self.actions:
-            action_info = "{}:{}".format(self.NAME, action.NAME)
+            action_info = f"{self.NAME}:{action.NAME}"
 
             LOG.info("Running %s", action_info)
 

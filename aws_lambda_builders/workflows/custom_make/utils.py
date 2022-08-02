@@ -23,8 +23,9 @@ class OSUtils(object):
         return os.makedirs(path)
 
     def popen(self, command, stdout=None, stderr=None, env=None, cwd=None):
-        p = subprocess.Popen(command, stdout=stdout, stderr=stderr, env=env, cwd=cwd)
-        return p
+        return subprocess.Popen(
+            command, stdout=stdout, stderr=stderr, env=env, cwd=cwd
+        )
 
     def environ(self):
         return os.environ.copy()

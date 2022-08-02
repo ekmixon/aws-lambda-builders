@@ -33,9 +33,9 @@ class TestProvidedMakeAction(TestCase):
             build_logical_id="logical_id",
         )
 
-        osutils.dirname.side_effect = lambda value: "/dir:{}".format(value)
-        osutils.abspath.side_effect = lambda value: "/abs:{}".format(value)
-        osutils.joinpath.side_effect = lambda a, b: "{}/{}".format(a, b)
+        osutils.dirname.side_effect = lambda value: f"/dir:{value}"
+        osutils.abspath.side_effect = lambda value: f"/abs:{value}"
+        osutils.joinpath.side_effect = lambda a, b: f"{a}/{b}"
 
         action.execute()
 
@@ -58,9 +58,9 @@ class TestProvidedMakeAction(TestCase):
             build_logical_id="logical_id",
         )
 
-        osutils.dirname.side_effect = lambda value: "/dir:{}".format(value)
-        osutils.abspath.side_effect = lambda value: "/abs:{}".format(value)
-        osutils.joinpath.side_effect = lambda a, b: "{}/{}".format(a, b)
+        osutils.dirname.side_effect = lambda value: f"/dir:{value}"
+        osutils.abspath.side_effect = lambda value: f"/abs:{value}"
+        osutils.joinpath.side_effect = lambda a, b: f"{a}/{b}"
 
         subprocess_make.run.side_effect = [MakeExecutionError(message="failure")]
 

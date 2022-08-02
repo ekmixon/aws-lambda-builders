@@ -26,4 +26,4 @@ class TestRuntimeValidator(TestCase):
         for runtime in runtime_list:
             validator = RuntimeValidator(runtime=runtime, architecture="arm64")
             with self.assertRaises(UnsupportedArchitectureError):
-                validator.validate("/usr/bin/{}".format(runtime))
+                validator.validate(f"/usr/bin/{runtime}")

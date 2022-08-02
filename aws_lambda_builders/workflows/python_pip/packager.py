@@ -41,7 +41,9 @@ class RequirementsFileNotFoundError(PackagerError):
     """
 
     def __init__(self, requirements_path):
-        super(RequirementsFileNotFoundError, self).__init__("Requirements file not found: %s" % requirements_path)
+        super(RequirementsFileNotFoundError, self).__init__(
+            f"Requirements file not found: {requirements_path}"
+        )
 
 
 class MissingDependencyError(PackagerError):
@@ -55,7 +57,9 @@ class NoSuchPackageError(PackagerError):
     """Raised when a package name or version could not be found."""
 
     def __init__(self, package_name):
-        super(NoSuchPackageError, self).__init__("Could not satisfy the requirement: %s" % package_name)
+        super(NoSuchPackageError, self).__init__(
+            f"Could not satisfy the requirement: {package_name}"
+        )
 
 
 class PackageDownloadError(PackagerError):
@@ -69,7 +73,9 @@ class UnsupportedPackageError(Exception):
 
     def __init__(self, package_name):
         # type: (str) -> None
-        super(UnsupportedPackageError, self).__init__("Unable to retrieve name/version for package: %s" % package_name)
+        super(UnsupportedPackageError, self).__init__(
+            f"Unable to retrieve name/version for package: {package_name}"
+        )
 
 
 class UnsupportedPythonVersion(PackagerError):
@@ -299,11 +305,10 @@ class DependencyBuilder(object):
         for package in deps:
             if package.dist_type == "sdist":
                 sdists.add(package)
+            elif self._is_compatible_wheel_filename(package.filename):
+                compatible_wheels.add(package)
             else:
-                if self._is_compatible_wheel_filename(package.filename):
-                    compatible_wheels.add(package)
-                else:
-                    incompatible_wheels.add(package)
+                incompatible_wheels.add(package)
         LOG.debug("initial compatible: %s", compatible_wheels)
         LOG.debug("initial incompatible: %s", incompatible_wheels | sdists)
 
@@ -408,16 +413,14 @@ class DependencyBuilder(object):
             if abi == "none":
                 return True
             prefix_version = implementation[:3]
-            if prefix_version == "cp3":
-                # Deploying python 3 function which means we need cp36m abi
-                # We can also accept abi3 which is the CPython 3 Stable ABI and
-                # will work on any version of python 3.
-                if abi == lambda_runtime_abi or abi == "abi3":
-                    return True
-            elif prefix_version == "cp2":
-                # Deploying to python 2 function which means we need cp27mu abi
-                if abi == "cp27mu":
-                    return True
+            if (
+                prefix_version == "cp2"
+                and abi == "cp27mu"
+                or prefix_version != "cp2"
+                and prefix_version == "cp3"
+                and abi in [lambda_runtime_abi, "abi3"]
+            ):
+                return True
         # Don't know what we have but it didn't pass compatibility tests.
         return False
 
@@ -437,7 +440,7 @@ class DependencyBuilder(object):
         # Try to get the matching value for legacy values or keep the current
         perennial_tag = self._MANYLINUX_LEGACY_MAP.get(platform, platform)
 
-        match = re.match("manylinux_([0-9]+)_([0-9]+)_" + arch, perennial_tag)
+        match = re.match(f"manylinux_([0-9]+)_([0-9]+)_{arch}", perennial_tag)
         if match is None:
             return False
 
@@ -525,7 +528,7 @@ class Package(object):
     @property
     def data_dir(self):
         # The directory format is {distribution}-{version}.data
-        return "%s-%s.data" % (self._name, self._version)
+        return f"{self._name}-{self._version}.data"
 
     def _normalize_name(self, name):
         # Taken directly from PEP 503
@@ -533,18 +536,20 @@ class Package(object):
 
     @property
     def identifier(self):
-        return "%s==%s" % (self._name, self._version)
+        return f"{self._name}=={self._version}"
 
     def __str__(self):
-        return "%s(%s)" % (self.identifier, self.dist_type)
+        return f"{self.identifier}({self.dist_type})"
 
     def __repr__(self):
         return str(self)
 
     def __eq__(self, other):
-        if not isinstance(other, Package):
-            return False
-        return self.identifier == other.identifier
+        return (
+            self.identifier == other.identifier
+            if isinstance(other, Package)
+            else False
+        )
 
     def __hash__(self):
         return hash(self.identifier)
@@ -653,8 +658,8 @@ class SubprocessPip(object):
             env_vars = self._osutils.original_environ()
         if shim is None:
             shim = ""
-        run_pip = ("import sys; %s; sys.exit(main(%s))") % (self._import_string, args)
-        exec_string = "%s%s" % (shim, run_pip)
+        run_pip = f"import sys; {self._import_string}; sys.exit(main({args}))"
+        exec_string = f"{shim}{run_pip}"
         invoke_pip = [self.python_exe, "-c", exec_string]
         p = self._osutils.popen(invoke_pip, stdout=self._osutils.pipe, stderr=self._osutils.pipe, env=env_vars)
         out, err = p.communicate()
@@ -711,9 +716,14 @@ class PipRunner(object):
             if err is None:
                 err = b"Unknown error"
             error = err.decode()
-            match = re.search(("Could not find a version that satisfies the " "requirement (.+?) "), error)
-            if match:
-                package_name = match.group(1)
+            if match := re.search(
+                (
+                    "Could not find a version that satisfies the "
+                    "requirement (.+?) "
+                ),
+                error,
+            ):
+                package_name = match[1]
                 raise NoSuchPackageError(str(package_name))
             raise PackageDownloadError(error)
 

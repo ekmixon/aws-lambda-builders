@@ -53,7 +53,8 @@ class TestSubprocessGradle(TestCase):
         with self.assertRaises(BuildFileNotFoundError) as raised:
             gradle.build(self.source_dir, self.manifest_path)
         self.assertEqual(
-            raised.exception.args[0], "Gradle Failed: Gradle build file not found: %s" % self.manifest_path
+            raised.exception.args[0],
+            f"Gradle Failed: Gradle build file not found: {self.manifest_path}",
         )
 
     def test_build_no_init_script(self):

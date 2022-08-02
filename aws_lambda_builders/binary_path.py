@@ -9,7 +9,7 @@ class BinaryPath(object):
         self.validator = validator
         self.binary = binary
         self._binary_path = binary_path
-        self.path_provided = True if self._binary_path else False
+        self.path_provided = bool(self._binary_path)
 
     @property
     def binary_path(self):

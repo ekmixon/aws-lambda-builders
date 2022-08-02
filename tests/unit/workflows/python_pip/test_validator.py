@@ -42,7 +42,7 @@ class TestPythonRuntimeValidator(TestCase):
         cmd = self.validator._validate_python_cmd(runtime_path="/usr/bin/python3.7")
         version_strings = ["sys.version_info.major == 3", "sys.version_info.minor == 7"]
         for version_string in version_strings:
-            self.assertTrue(all([part for part in cmd if version_string in part]))
+            self.assertTrue(all(part for part in cmd if version_string in part))
 
     @parameterized.expand(
         [

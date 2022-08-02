@@ -39,11 +39,7 @@ class SubprocessNpm(object):
         self.osutils = osutils
 
         if npm_exe is None:
-            if osutils.is_windows():
-                npm_exe = "npm.cmd"
-            else:
-                npm_exe = "npm"
-
+            npm_exe = "npm.cmd" if osutils.is_windows() else "npm"
         self.npm_exe = npm_exe
 
     def run(self, args, cwd=None):

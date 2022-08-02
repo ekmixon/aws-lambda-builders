@@ -42,11 +42,7 @@ def copytree(source, destination, ignore=None):
             LOG.debug("Unable to copy file access times from %s to %s", source, destination, exc_info=ex)
 
     names = os.listdir(source)
-    if ignore is not None:
-        ignored_names = ignore(source, names)
-    else:
-        ignored_names = set()
-
+    ignored_names = ignore(source, names) if ignore is not None else set()
     for name in names:
         # Skip ignored names
         if name in ignored_names:
@@ -70,7 +66,7 @@ def copytree(source, destination, ignore=None):
 # Copyright 2019 by the Python Software Foundation
 
 
-def which(cmd, mode=os.F_OK | os.X_OK, executable_search_paths=None):  # pragma: no cover
+def which(cmd, mode=os.F_OK | os.X_OK, executable_search_paths=None):    # pragma: no cover
     """Given a command, mode, and executable search paths list, return the paths which
     conforms to the given mode on the PATH with the prepended additional search paths,
     or None if there is no such file.
@@ -102,11 +98,7 @@ def which(cmd, mode=os.F_OK | os.X_OK, executable_search_paths=None):  # pragma:
     # rather than referring to PATH directories. This includes checking
     # relative to the current directory, e.g. ./script
     if os.path.dirname(cmd):
-        if _access_check(cmd, mode):
-            return cmd
-
-        return None
-
+        return cmd if _access_check(cmd, mode) else None
     path = os.environ.get("PATH", os.defpath)
 
     if not path:

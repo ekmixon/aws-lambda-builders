@@ -34,11 +34,7 @@ class SubprocessBundler(object):
     def __init__(self, osutils, bundler_exe=None):
         self.osutils = osutils
         if bundler_exe is None:
-            if osutils.is_windows():
-                bundler_exe = "bundler.bat"
-            else:
-                bundler_exe = "bundle"
-
+            bundler_exe = "bundler.bat" if osutils.is_windows() else "bundle"
         self.bundler_exe = bundler_exe
 
     def run(self, args, cwd=None):
@@ -57,15 +53,14 @@ class SubprocessBundler(object):
         out, _ = p.communicate()
 
         if p.returncode != 0:
-            if p.returncode == GEMFILE_NOT_FOUND:
-                LOG.warning("Gemfile not found. Continuing the build without dependencies.")
-
-                # Clean up '.bundle' dir that gets generated before the build fails
-                check_dir = self.osutils.get_bundle_dir(cwd)
-                if self.osutils.directory_exists(check_dir):
-                    self.osutils.remove_directory(check_dir)
-            else:
+            if p.returncode != GEMFILE_NOT_FOUND:
                 # Bundler has relevant information in stdout, not stderr.
                 raise BundlerExecutionError(message=out.decode("utf8").strip())
 
+            LOG.warning("Gemfile not found. Continuing the build without dependencies.")
+
+            # Clean up '.bundle' dir that gets generated before the build fails
+            check_dir = self.osutils.get_bundle_dir(cwd)
+            if self.osutils.directory_exists(check_dir):
+                self.osutils.remove_directory(check_dir)
         return out.decode("utf8").strip()

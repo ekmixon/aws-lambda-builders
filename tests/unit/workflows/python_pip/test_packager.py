@@ -33,10 +33,7 @@ class FakePip(object):
 
     def main(self, args, env_vars=None, shim=None):
         self._calls.append(FakePipCall(args, env_vars, shim))
-        if self._returns:
-            return self._returns.pop(0)
-        # Return an rc of 0 and an empty stderr and stdout
-        return 0, b"", b""
+        return self._returns.pop(0) if self._returns else (0, b"", b"")
 
     def add_return(self, return_pair):
         self._returns.append(return_pair)
@@ -149,8 +146,7 @@ class TestPackage(object):
             Package("", "foobar.jpg")
 
     def test_diff_pkg_sdist_and_whl_do_not_collide(self):
-        pkgs = set()
-        pkgs.add(Package("", "foobar-1.0-py3-none-any.whl"))
+        pkgs = {Package("", "foobar-1.0-py3-none-any.whl")}
         pkgs.add(Package("", "badbaz-1.0-py3-none-any.whl"))
         assert len(pkgs) == 2
 
@@ -165,8 +161,7 @@ class TestPackage(object):
 
     def test_pkg_is_not_equal_to_different_type(self):
         pkg = Package("", "foobar-1.0-py3-none-any.whl")
-        non_package_type = 1
-        assert not (pkg == non_package_type)
+        assert pkg != 1
 
     def test_pkg_repr(self):
         pkg = Package("", "foobar-1.0-py3-none-any.whl")

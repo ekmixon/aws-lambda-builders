@@ -54,7 +54,7 @@ class GlobalToolInstallAction(BaseAction):
                     GlobalToolInstallAction.__tools_installed = True
                 except DotnetCLIExecutionError as ex:
                     raise ActionFailedError(
-                        "Error configuring the Amazon.Lambda.Tools .NET Core Global Tool: " + str(ex)
+                        f"Error configuring the Amazon.Lambda.Tools .NET Core Global Tool: {str(ex)}"
                     )
 
 
@@ -75,13 +75,13 @@ class RunPackageAction(BaseAction):
         self.options = options
         self.mode = mode
         self.architecture = architecture
-        self.os_utils = os_utils if os_utils else OSUtils()
+        self.os_utils = os_utils or OSUtils()
 
     def execute(self):
         try:
             LOG.debug("Running `dotnet lambda package` in %s", self.source_dir)
 
-            zipfilename = os.path.basename(os.path.normpath(self.source_dir)) + ".zip"
+            zipfilename = f"{os.path.basename(os.path.normpath(self.source_dir))}.zip"
             zipfullpath = os.path.join(self.artifacts_dir, zipfilename)
 
             arguments = [
@@ -89,10 +89,10 @@ class RunPackageAction(BaseAction):
                 "package",
                 "--output-package",
                 zipfullpath,
-                # Specify the architecture with the --runtime MSBuild parameter
                 "--msbuild-parameters",
-                "--runtime " + self._get_runtime(),
+                f"--runtime {self._get_runtime()}",
             ]
+
 
             if self.mode and self.mode.lower() == BuildMode.DEBUG:
                 LOG.debug("Debug build requested: Setting configuration to Debug")

@@ -22,9 +22,9 @@ class TestNodejsNpmPackAction(TestCase):
             "artifacts", "scratch_dir", "manifest", osutils=osutils, subprocess_npm=subprocess_npm
         )
 
-        osutils.dirname.side_effect = lambda value: "/dir:{}".format(value)
-        osutils.abspath.side_effect = lambda value: "/abs:{}".format(value)
-        osutils.joinpath.side_effect = lambda a, b: "{}/{}".format(a, b)
+        osutils.dirname.side_effect = lambda value: f"/dir:{value}"
+        osutils.abspath.side_effect = lambda value: f"/abs:{value}"
+        osutils.joinpath.side_effect = lambda a, b: f"{a}/{b}"
 
         subprocess_npm.run.return_value = "package.tar"
 
@@ -84,7 +84,7 @@ class TestNodejsNpmrcCopyAction(TestCase):
     @patch("aws_lambda_builders.workflows.nodejs_npm.utils.OSUtils")
     def test_copies_npmrc_into_a_project(self, OSUtilMock):
         osutils = OSUtilMock.return_value
-        osutils.joinpath.side_effect = lambda a, b: "{}/{}".format(a, b)
+        osutils.joinpath.side_effect = lambda a, b: f"{a}/{b}"
 
         action = NodejsNpmrcCopyAction("artifacts", "source", osutils=osutils)
         osutils.file_exists.side_effect = [True]
@@ -96,7 +96,7 @@ class TestNodejsNpmrcCopyAction(TestCase):
     @patch("aws_lambda_builders.workflows.nodejs_npm.utils.OSUtils")
     def test_skips_copying_npmrc_into_a_project_if_npmrc_doesnt_exist(self, OSUtilMock):
         osutils = OSUtilMock.return_value
-        osutils.joinpath.side_effect = lambda a, b: "{}/{}".format(a, b)
+        osutils.joinpath.side_effect = lambda a, b: f"{a}/{b}"
 
         action = NodejsNpmrcCopyAction("artifacts", "source", osutils=osutils)
         osutils.file_exists.side_effect = [False]
@@ -108,7 +108,7 @@ class TestNodejsNpmrcCopyAction(TestCase):
     @patch("aws_lambda_builders.workflows.nodejs_npm.utils.OSUtils")
     def test_raises_action_failed_when_copying_fails(self, OSUtilMock):
         osutils = OSUtilMock.return_value
-        osutils.joinpath.side_effect = lambda a, b: "{}/{}".format(a, b)
+        osutils.joinpath.side_effect = lambda a, b: f"{a}/{b}"
 
         osutils.copy_file.side_effect = OSError()
 
@@ -122,7 +122,7 @@ class TestNodejsNpmrcCleanUpAction(TestCase):
     @patch("aws_lambda_builders.workflows.nodejs_npm.utils.OSUtils")
     def test_removes_npmrc_if_npmrc_exists(self, OSUtilMock):
         osutils = OSUtilMock.return_value
-        osutils.joinpath.side_effect = lambda a, b: "{}/{}".format(a, b)
+        osutils.joinpath.side_effect = lambda a, b: f"{a}/{b}"
 
         action = NodejsNpmrcCleanUpAction("artifacts", osutils=osutils)
         osutils.file_exists.side_effect = [True]
@@ -133,7 +133,7 @@ class TestNodejsNpmrcCleanUpAction(TestCase):
     @patch("aws_lambda_builders.workflows.nodejs_npm.utils.OSUtils")
     def test_skips_npmrc_removal_if_npmrc_doesnt_exist(self, OSUtilMock):
         osutils = OSUtilMock.return_value
-        osutils.joinpath.side_effect = lambda a, b: "{}/{}".format(a, b)
+        osutils.joinpath.side_effect = lambda a, b: f"{a}/{b}"
 
         action = NodejsNpmrcCleanUpAction("artifacts", osutils=osutils)
         osutils.file_exists.side_effect = [False]
